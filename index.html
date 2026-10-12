@@ -50,6 +50,11 @@
   .msg .bb{background:#fff;border-radius:14px;padding:7px 11px;white-space:pre-wrap;font-size:14px;max-width:270px;overflow-wrap:break-word}
   .msg.bot .av{background:var(--line-green)}
   .sys{align-self:center;background:rgba(0,0,0,.25);color:#fff;font-size:12px;border-radius:99px;padding:2px 10px}
+  .report{background:#fff;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.7}
+  .report b{display:block;margin-bottom:2px}
+  .report .hl{background:var(--amber-bg);border-radius:6px;padding:4px 8px;margin-top:6px}
+  .report a{color:var(--blue)}
+  tr.dup td{background:#f6f8fa;color:#8a929b}
   .hint{color:#fff;font-size:13px;text-align:center;opacity:.9;margin-top:auto}
   /* Ragic 表 */
   .right{display:flex;flex-direction:column;gap:12px;min-width:0}
@@ -112,6 +117,9 @@
     <div class="b"><b>③ 機器人回群組</b>回的字跟現在一模一樣</div><div class="arr">→</div>
     <div class="b new"><b>④ 新的：記進 Ragic</b>「銀行入帳明細」多一列；對得上唯一一張單，就把截圖貼上那張單、標已入帳</div>
   </div>
+  <div class="flow">
+    <div class="b new"><b>⑤ 新的：每天早上 7 點，機器人自己抄一次</b>上班前登入中信一次，把兩個戶頭前一天進來的每一筆錢都抄進新表；沒人查過、對不到單的錢標「待認領」，08:45 早報告訴瓊安「昨天有幾筆錢沒人認」。見例子 ⑦。</div>
+  </div>
 
   <div class="tabs" id="tabs"></div>
 
@@ -127,7 +135,7 @@
 
   <div class="grid">
     <div class="panel">
-      <div class="t" style="background:#2c3e5c;color:#fff">LINE｜租押金服務費群組</div>
+      <div class="t" id="chatTitle" style="background:#2c3e5c;color:#fff">LINE｜租押金服務費群組</div>
       <div class="chat" id="chat"></div>
     </div>
     <div class="right">
@@ -253,6 +261,29 @@ const S = [
      docs:'none'},
    ],
  },
+ { key:'s7', tab:'⑦ 每天早上整批抄',
+   title:'每天早上 7 點整批抄前一天的錢 → 沒人認的錢進早報',
+   chatTitle:'機器人自己做的事＋給瓊安的早報',
+   desc:'10/12 白天同仁查過兩筆（15,000、32,000）。但那天其實進來 5 筆錢，另外 3 筆沒人查過。隔天早上 7 點、上班前，機器人自己登入一次，把兩個戶頭 10/12 進來的錢全部抄進新表。白天查過的不會重複記。',
+   shot:{date:'2026/10/12',amt:'5,000',note:'蔡欣怡',acct:'004****11834'},
+   baseRows:[
+    {t:'10/12 11:34',c:'三重正義北路套房',m:'32,000',l5:'90577',d:'10/12',who:'',shot:true,r:'ok',doc:'收款憑單 #R-1186',n:'白天同仁查過（早上整批抄時不重複記）'},
+    {t:'10/12 11:20',c:'新莊幸福路兩房',m:'15,000',l5:'48213',d:'10/12',who:'林雅婷',shot:true,r:'ok',doc:'定金單 #D-0312',n:'白天同仁查過（早上整批抄時不重複記）'},
+   ],
+   steps:[
+    {now:'10/13 早上 07:00，機器人自己登入中信一次（這時沒人在查帳，不會撞到群組）。白天沒人查過的 3 筆被抄進來：1 筆對上收款憑單、自動貼上；2 筆對不到任何單，標「待認領」。群組不會收到訊息。',
+     chat:[['sys','10/13 07:00 機器人自己登入中信'],['report','<b>機器人自己做的事</b>抄兩個戶頭 10/12 的入帳，共 5 筆：<br>· 2 筆白天同仁查過 → 不重複記<br>· 1 筆對上收款憑單 → 自動貼上<br>· 2 筆對不到單 → 標「待認領」']],
+     rows:[
+      {t:'10/13 07:00',c:'蘆洲長安街套房',m:'5,000',l5:'11834',d:'10/12',who:'',shot:true,r:'ok',doc:'收款憑單 #R-1197',n:'早上整批抄進來（白天沒人查過），自動對上',shotData:{date:'2026/10/12',amt:'5,000',note:'蔡欣怡',acct:'004****11834'}},
+      {t:'10/13 07:00',c:'（還沒對上）',m:'3,600',l5:'50277',d:'10/12',who:'',shot:true,r:'wait',doc:'',n:'租售戶頭；對不到任何單、沒人認',shotData:{date:'2026/10/12',amt:'3,600',note:'',acct:'812****50277'}},
+      {t:'10/13 07:00',c:'（還沒對上）',m:'18,000',l5:'92406',d:'10/12',who:'',shot:true,r:'wait',doc:'',n:'裝潢戶頭；對不到任何單、沒人認',shotData:{date:'2026/10/12',amt:'18,000',note:'張先生',acct:'822****92406'}},
+     ],
+     docs:'after'},
+    {now:'08:45 瓊安的早報多一段：昨天有幾筆錢沒人認，點連結直接看是哪幾筆。之後有人開了對得上的單，會像例子 ④ 那樣自動補上。',
+     chat:[['report','<b>08:45 早報｜收款對帳</b>昨天（10/12）兩個戶頭共進來 5 筆錢，3 筆已對上單。<div class="hl"><b>2 筆錢沒人認，共 21,600 元</b>· 3,600（末五碼 50277，租售戶頭）<br>· 18,000（末五碼 92406，裝潢戶頭）<br><a href="javascript:void(0)" onclick="document.querySelector(\'.tw\').scrollIntoView({behavior:\'smooth\'})">打開「銀行入帳明細」看待認領的錢 →</a></div>']]},
+   ],
+   docsAfter:[{kind:'收款憑單 #R-1197',stamp:'已入帳',shotIdx:0,f:[['案名','蘆洲長安街套房'],['項目','服務費'],['金額','5,000'],['匯款後五碼','11834'],['入帳勾稽狀態','已入帳（自動）','chg'],['實際入帳日','2026/10/12','chg'],['對帳證明','SHOT','chg'],['對帳人','（空：早上自動抄進來，沒有人叫機器人查）','chg']]}],
+ },
 ];
 
 let cur = 0, step = 0;
@@ -265,20 +296,23 @@ function shotHTML(sh){
   <tbody><tr><td>${sh.date}</td><td>跨行轉入</td><td>${sh.amt}</td><td><span class="mosaic"></span></td><td>${sh.acct}</td><td>${esc(sh.note)}</td></tr></tbody></table>
   <div class="cap">機器人查帳時同一次登入截下（示意圖）</div></div>`;
 }
-function openShot(){ $('modalBody').innerHTML = shotHTML(S[cur].shot); $('modal').classList.add('on'); }
+let shots = [];
+function openShot(i){ $('modalBody').innerHTML = shotHTML(shots[i] || S[cur].shot); $('modal').classList.add('on'); }
 function closeShot(){ $('modal').classList.remove('on'); }
 $('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeShot(); });
 
 function rowHTML(r, fresh){
   const [cls, label] = RES[r.r];
-  const shot = r.shot ? (fresh ? `<button class="shotbtn" onclick="openShot()">看截圖</button>` : `<span class="mini" title="舊紀錄的截圖"></span>`) : '<span class="empty">—</span>';
+  let shot = '<span class="empty">—</span>';
+  if (r.shot && fresh){ shots.push(r.shotData || S[cur].shot); shot = `<button class="shotbtn" onclick="openShot(${shots.length-1})">看截圖</button>`; }
+  else if (r.shot) shot = `<span class="mini" title="舊紀錄的截圖"></span>`;
   return `<tr class="${fresh?'fresh':'old'}"><td>${r.t}</td><td>${esc(r.c)}</td><td>${r.m}</td><td>${r.l5}</td><td>${r.d||'<span class="empty">—</span>'}</td>
   <td>${r.who?esc(r.who):'<span class="empty">（空）</span>'}</td><td>${shot}</td><td><span class="tag ${cls}">${label}</span></td>
   <td>${r.doc||'<span class="empty">—</span>'}</td><td class="note">${esc(r.n)}</td></tr>`;
 }
 function docHTML(d, mode){
   const rows = d.f.map(([k,v,flag]) => {
-    let val = v === 'SHOT' ? `<span class="mini" onclick="openShot()" title="點開看截圖"></span>` : (v ? esc(v) : '<span class="empty">（空）</span>');
+    let val = v === 'SHOT' ? `<span class="mini" onclick="openShot(${d.shotIdx ?? -1})" title="點開看截圖"></span>` : (v ? esc(v) : '<span class="empty">（空）</span>');
     return `<dt>${k}</dt><dd class="${flag||''}">${val}</dd>`;
   }).join('');
   const mark = d.stamp ? `<div class="stamp">${d.stamp}</div>` : (mode === 'untouched' ? `<div class="untouched">沒被動到</div>` : '');
@@ -292,22 +326,26 @@ function render(){
   $('sDesc').textContent = s.desc;
 
   // 聊天
-  let chat = [], row = null, docsMode = 'before';
+  let chat = [], fresh = [], docsMode = 'before';
   for (let i = 0; i < step; i++){
     const st = s.steps[i];
     chat = chat.concat(st.chat || []);
-    if (st.row) row = {...st.row};
-    if (st.update) Object.assign(row, st.update);
+    if (st.row) fresh = [{...st.row}];
+    if (st.rows) fresh = st.rows.map(r => ({...r})).concat(fresh);
+    if (st.update) Object.assign(fresh[0], st.update);
     if (st.docs) docsMode = st.docs;
   }
+  $('chatTitle').textContent = s.chatTitle || 'LINE｜租押金服務費群組';
   $('chat').innerHTML = chat.map(([who, text]) => {
     if (who === 'sys') return `<div class="sys">${esc(text)}</div>`;
+    if (who === 'report') return `<div class="report">${text}</div>`;
     if (who === 'bot') return `<div class="msg bot"><div class="av">查</div><div><div class="nm">查帳機器人</div><div class="bb">${esc(text)}</div></div></div>`;
     return `<div class="msg"><div class="av" style="background:${COLORS[who]||'#888'}">${esc(who.slice(0,1))}</div><div><div class="nm">${esc(who)}</div><div class="bb">${esc(text)}</div></div></div>`;
   }).join('') + (step === 0 ? '<div class="hint">按上面「下一步」開始</div>' : '');
 
   // 新表
-  $('rows').innerHTML = (row ? rowHTML(row, true) : '') + OLD_ROWS.map(r => rowHTML(r, false)).join('');
+  shots = [];
+  $('rows').innerHTML = fresh.map(r => rowHTML(r, true)).join('') + (s.baseRows || OLD_ROWS).map(r => rowHTML(r, false)).join('');
 
   // 單
   let docs = '';
