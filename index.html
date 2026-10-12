@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>查帳留底示範頁（假資料）</title>
+<style>
+  :root{
+    --bg:#f4f5f7; --card:#fff; --ink:#1f2328; --sub:#636c76; --line:#d8dde3;
+    --green:#1a7f37; --green-bg:#dcfce7; --amber:#9a6700; --amber-bg:#fff4d6;
+    --blue:#0b62c4; --blue-bg:#e3efff; --red:#b42318; --red-bg:#fde8e7; --grey-bg:#eef0f3;
+    --line-green:#06c755;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.6}
+  header{background:#1f2937;color:#fff;padding:18px 20px}
+  header h1{margin:0;font-size:20px}
+  header p{margin:4px 0 0;color:#cbd5e1;font-size:14px}
+  .fake{display:inline-block;background:#f59e0b;color:#1f2937;font-size:12px;font-weight:700;padding:1px 8px;border-radius:99px;margin-left:8px;vertical-align:middle}
+  main{max-width:1240px;margin:0 auto;padding:16px}
+  .flow{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap;margin-bottom:16px}
+  .flow .b{flex:1 1 170px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px}
+  .flow .b b{display:block;font-size:15px}
+  .flow .b.new{border:2px solid var(--blue);background:var(--blue-bg)}
+  .flow .arr{align-self:center;color:var(--sub);font-size:20px}
+  @media (max-width:700px){.flow .arr{display:none}}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .tabs button{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:8px 14px;font-size:14px;cursor:pointer;min-height:38px}
+  .tabs button.on{background:#1f2937;color:#fff;border-color:#1f2937}
+  .story{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+  .story h2{margin:0 0 4px;font-size:17px}
+  .story .now{margin-top:8px;padding:8px 10px;background:var(--grey-bg);border-radius:8px;font-size:14px}
+  .ctrl{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .ctrl button{border:0;border-radius:8px;padding:9px 16px;font-size:15px;cursor:pointer;min-height:40px}
+  .next{background:var(--blue);color:#fff}
+  .next:disabled{background:#9db8dd;cursor:default}
+  .reset{background:var(--grey-bg);color:var(--ink)}
+  .grid{display:grid;grid-template-columns:340px 1fr;gap:12px}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .panel>.t{padding:8px 12px;font-weight:700;font-size:14px;border-bottom:1px solid var(--line);background:#fafbfc}
+  .panel>.t small{font-weight:400;color:var(--sub)}
+  /* LINE 群組 */
+  .chat{background:#8cabd8;padding:12px;min-height:260px;display:flex;flex-direction:column;gap:10px}
+  .chat .t{background:#2c3e5c}
+  .msg{display:flex;gap:8px;align-items:flex-start}
+  .msg .av{width:32px;height:32px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:700}
+  .msg .nm{font-size:12px;color:#1e2a3d;margin-bottom:2px}
+  .msg .bb{background:#fff;border-radius:14px;padding:7px 11px;white-space:pre-wrap;font-size:14px;max-width:270px;overflow-wrap:break-word}
+  .msg.bot .av{background:var(--line-green)}
+  .sys{align-self:center;background:rgba(0,0,0,.25);color:#fff;font-size:12px;border-radius:99px;padding:2px 10px}
+  .hint{color:#fff;font-size:13px;text-align:center;opacity:.9;margin-top:auto}
+  /* Ragic 表 */
+  .right{display:flex;flex-direction:column;gap:12px;min-width:0}
+  .grid>.panel{min-width:0}
+  .tw{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:13px;min-width:860px}
+  th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;white-space:nowrap}
+  th{background:#f0f3f7;color:#3b4450;font-weight:600}
+  tr.old td{color:#8a929b}
+  tr.fresh td{background:#fffbe6;animation:pop 1.2s ease}
+  @keyframes pop{from{background:#ffe58f}to{background:#fffbe6}}
+  .tag{display:inline-block;border-radius:99px;padding:1px 9px;font-size:12px;font-weight:700}
+  .ok{background:var(--green-bg);color:var(--green)}
+  .maybe{background:var(--amber-bg);color:var(--amber)}
+  .wait{background:var(--blue-bg);color:var(--blue)}
+  .none{background:var(--grey-bg);color:var(--sub)}
+  .shotbtn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:2px 8px;font-size:12px;cursor:pointer}
+  .empty{color:#b0b6bd}
+  .note{white-space:normal;min-width:200px;color:var(--sub)}
+  /* 單 */
+  .docs{display:flex;gap:12px;flex-wrap:wrap;padding:12px}
+  .doc{flex:1 1 280px;border:1px solid var(--line);border-radius:8px;overflow:hidden;position:relative}
+  .doc .h{background:#f0f3f7;padding:6px 10px;font-weight:700;font-size:14px;display:flex;justify-content:space-between;gap:6px}
+  .doc dl{display:grid;grid-template-columns:118px 1fr;margin:0;padding:8px 10px;gap:3px 8px;font-size:13px}
+  .doc dt{color:var(--sub)}
+  .doc dd{margin:0}
+  .doc dd.chg{background:var(--green-bg);border-radius:4px;padding:0 4px;font-weight:700;color:var(--green)}
+  .doc dd.keep{color:var(--sub)}
+  .stamp{position:absolute;right:10px;top:38px;border:3px solid var(--green);color:var(--green);font-weight:800;padding:2px 8px;border-radius:6px;transform:rotate(-8deg);background:rgba(255,255,255,.85);font-size:14px}
+  .stamp.amber{border-color:var(--amber);color:var(--amber)}
+  .nodoc{padding:22px 12px;color:var(--sub);text-align:center;font-size:14px}
+  .untouched{position:absolute;right:10px;top:38px;font-size:12px;background:var(--grey-bg);color:var(--sub);border-radius:99px;padding:1px 9px}
+  /* 截圖 */
+  .shot{font-family:-apple-system,"PingFang TC",sans-serif;background:#fff;border:1px solid #c9ced6;border-radius:6px;overflow:hidden;width:100%;max-width:560px}
+  .shot .bk{background:#00684a;color:#fff;font-size:12px;padding:5px 10px}
+  .shot table{min-width:0;font-size:12px}
+  .shot th{background:#e8efe9}
+  .mosaic{display:inline-block;width:70px;height:14px;vertical-align:middle;background:repeating-linear-gradient(45deg,#9aa3ad 0 4px,#c8ced5 4px 8px);border-radius:2px}
+  .shot .cap{font-size:11px;color:var(--sub);padding:4px 10px;border-top:1px solid #e3e6ea}
+  .mini{display:inline-block;width:56px;height:30px;border:1px solid #c9ced6;border-radius:4px;background:linear-gradient(#00684a 0 7px,#fff 7px);vertical-align:middle;cursor:pointer;position:relative}
+  .mini::after{content:"";position:absolute;left:5px;right:5px;top:14px;height:5px;background:#e9c46a;border-radius:2px}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:9}
+  .modal.on{display:flex}
+  .modal .box{background:#fff;border-radius:10px;padding:14px;max-width:600px;width:100%}
+  .modal .box h3{margin:0 0 8px;font-size:16px}
+  .modal .box p{margin:8px 0 0;font-size:13px;color:var(--sub)}
+  .modal .box button{margin-top:10px}
+  footer{max-width:1240px;margin:0 auto;padding:4px 16px 30px;color:var(--sub);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <h1>查帳留底示範頁<span class="fake">假資料</span></h1>
+  <p>同仁在「租押金服務費」群組叫機器人查帳，查完不再只留在聊天紀錄，而是同時記進 Ragic。這頁所有人名、案件、金額都是編的，按了不會動到任何真的資料。</p>
+</header>
+<main>
+  <div class="flow">
+    <div class="b"><b>① 同仁在群組叫機器人</b>跟現在一樣打金額＋末五碼</div><div class="arr">→</div>
+    <div class="b"><b>② 機器人去中信查</b>跟現在一樣，順手截一張那筆入帳的圖（同一次登入）</div><div class="arr">→</div>
+    <div class="b"><b>③ 機器人回群組</b>回的字跟現在一模一樣</div><div class="arr">→</div>
+    <div class="b new"><b>④ 新的：記進 Ragic</b>「銀行入帳明細」多一列；對得上唯一一張單，就把截圖貼上那張單、標已入帳</div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="story">
+    <h2 id="sTitle"></h2>
+    <div id="sDesc"></div>
+    <div class="now" id="sNow"></div>
+    <div class="ctrl">
+      <button class="next" id="btnNext">下一步 ▶</button>
+      <button class="reset" id="btnReset">從頭再看一次</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <div class="t" style="background:#2c3e5c;color:#fff">LINE｜租押金服務費群組</div>
+      <div class="chat" id="chat"></div>
+    </div>
+    <div class="right">
+      <div class="panel">
+        <div class="t">Ragic｜銀行入帳明細 <small>（新表：每查一次就多一列，永久留著）</small></div>
+        <div class="tw"><table>
+          <thead><tr><th>查帳時間</th><th>案件</th><th>金額</th><th>末五碼</th><th>入帳日</th><th>對帳人</th><th>對帳證明截圖</th><th>勾稽結果</th><th>對應的單</th><th>備註</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table></div>
+      </div>
+      <div class="panel">
+        <div class="t">Ragic｜對應的單 <small>（定金單或收款憑單）</small></div>
+        <div class="docs" id="docs"></div>
+      </div>
+    </div>
+  </div>
+</main>
+<footer>
+  看完這頁請跟工程師說「可以」或要改哪裡。說可以之後，正式做之前還會先：在 Ragic 用測試單實際試寫、跟珊珊確認新欄位的名字不會跟會計簽核搞混。<br>
+  勾稽結果四種：<span class="tag ok">已確認</span> 對上唯一一張單、自動貼上；<span class="tag maybe">疑似</span> 對到好幾張或像是合併匯款，不自動動單、等人確認；<span class="tag wait">待認領</span> 錢到了但還沒有單，等單開了再補；<span class="tag none">查無入帳</span> 中信沒有這筆，只記一列。
+</footer>
+
+<div class="modal" id="modal"><div class="box">
+  <h3>對帳證明截圖</h3>
+  <div id="modalBody"></div>
+  <p>只截那一列；餘額打馬賽克，同一天其他人的匯款不會出現在圖上。</p>
+  <button class="reset" onclick="closeShot()">關閉</button>
+</div></div>
+
+<script>
+const OLD_ROWS = [
+  {t:'10/11 16:42',c:'板橋文化路套房',m:'8,500',l5:'20871',d:'10/11',who:'陳怡君',shot:true,r:'ok',doc:'收款憑單 #R-1172',n:''},
+  {t:'10/11 10:05',c:'（還沒對上）',m:'6,000',l5:'55013',d:'10/11',who:'黃柏翰',shot:true,r:'wait',doc:'',n:'錢到了但找不到單，等單開了再補'},
+];
+const RES = {ok:['ok','已確認'],maybe:['maybe','疑似'],wait:['wait','待認領'],none:['none','查無入帳'],okLate:['ok','已確認（補上）']};
+const COLORS = {'林雅婷':'#d9467a','阿凱🏠':'#7c5cff','王志明':'#e67e22','吳佩珊':'#16a085','張家豪':'#2d6cdf','李宗翰':'#8e44ad'};
+
+const S = [
+ { key:'s1', tab:'① 對上一張定金單',
+   title:'對上唯一一張定金單 → 自動貼上、標已入帳',
+   desc:'林雅婷查一筆 15,000 的定金。金額＋末五碼剛好只對上一張還沒入帳的定金單。',
+   shot:{date:'2026/10/12',amt:'15,000',note:'陳志豪',acct:'822****48213'},
+   steps:[
+    {now:'林雅婷在群組叫機器人查帳。', chat:[['林雅婷','@查帳機器人 查帳 15000 48213']]},
+    {now:'機器人回群組（跟現在一樣），同時在 Ragic 新表記一列，並找到那張定金單。',
+     chat:[['bot','✅【租售】2026/10/12 入帳 $15,000\n註記：陳志豪']],
+     row:{t:'10/12 11:20',c:'新莊幸福路兩房',m:'15,000',l5:'48213',d:'10/12',who:'林雅婷',shot:true,r:'ok',doc:'定金單 #D-0312',n:''},
+     docs:'after'},
+   ],
+   docsBefore:[{kind:'定金單 #D-0312',f:[['案名','新莊幸福路兩房'],['租客','陳志豪'],['定金金額','15,000'],['匯款後五碼','48213'],['會計簽核狀態','待簽核'],['入帳勾稽狀態','未勾稽'],['實際入帳日',''],['對帳證明',''],['對帳人','']]}],
+   docsAfter:[{kind:'定金單 #D-0312',stamp:'已入帳',f:[['案名','新莊幸福路兩房'],['租客','陳志豪'],['定金金額','15,000'],['匯款後五碼','48213'],['會計簽核狀態','待簽核','keep'],['入帳勾稽狀態','已入帳（自動）','chg'],['實際入帳日','2026/10/12','chg'],['對帳證明','SHOT','chg'],['對帳人','林雅婷','chg']]}],
+   footNote:'「會計簽核狀態」不會被動到，那是珊珊簽核用的，跟「銀行真的入帳了」是兩回事。'
+ },
+ { key:'s2', tab:'② 對上一張收款憑單',
+   title:'對上唯一一張收款憑單（租金押金／服務費）',
+   desc:'LINE 暱稱「阿凱🏠」查一筆 32,000 的押金＋首月租金。對上一張收款憑單。他的 LINE 暱稱對不到 Ragic 帳號，所以對帳人先空著、備註寫 LINE 名稱，不亂猜是誰。',
+   shot:{date:'2026/10/12',amt:'32,000',note:'林美華',acct:'013****90577'},
+   steps:[
+    {now:'阿凱🏠 在群組叫機器人查帳。', chat:[['阿凱🏠','@查帳機器人 查帳 32000 90577']]},
+    {now:'機器人回群組，新表記一列，收款憑單貼上截圖、標已入帳。對帳人對不到就留空。',
+     chat:[['bot','✅【租售】2026/10/12 入帳 $32,000\n註記：林美華']],
+     row:{t:'10/12 11:34',c:'三重正義北路套房',m:'32,000',l5:'90577',d:'10/12',who:'',shot:true,r:'ok',doc:'收款憑單 #R-1186',n:'對帳人對不到 Ragic 帳號，LINE 名稱：阿凱🏠'},
+     docs:'after'},
+   ],
+   docsBefore:[{kind:'收款憑單 #R-1186',f:[['案名','三重正義北路套房'],['項目','押金＋首月租金'],['金額','32,000'],['匯款後五碼','90577'],['入帳勾稽狀態','未勾稽'],['實際入帳日',''],['對帳證明',''],['對帳人','']]}],
+   docsAfter:[{kind:'收款憑單 #R-1186',stamp:'已入帳',f:[['案名','三重正義北路套房'],['項目','押金＋首月租金'],['金額','32,000'],['匯款後五碼','90577'],['入帳勾稽狀態','已入帳（自動）','chg'],['實際入帳日','2026/10/12','chg'],['對帳證明','SHOT','chg'],['對帳人','（空，LINE 名稱：阿凱🏠）','chg']]}],
+ },
+ { key:'s3', tab:'③ 對到兩張',
+   title:'金額＋末五碼對到兩張 → 標「疑似」、兩張都不動',
+   desc:'王志明查一筆 10,000。同一位房客有兩張收款憑單都是 10,000、末五碼也一樣，機器人分不出是哪一張。寧可不勾，也不勾錯。',
+   shot:{date:'2026/10/12',amt:'10,000',note:'許文傑',acct:'700****77120'},
+   steps:[
+    {now:'王志明在群組叫機器人查帳。', chat:[['王志明','@查帳機器人 查帳 10000 77120']]},
+    {now:'機器人照常回群組。新表記一列標「疑似」，寫出是哪兩張；兩張單都不動，等人看過再補。',
+     chat:[['bot','✅【租售】2026/10/12 入帳 $10,000\n註記：許文傑']],
+     row:{t:'10/12 13:02',c:'蘆洲中正路A室／B室',m:'10,000',l5:'77120',d:'10/12',who:'王志明',shot:true,r:'maybe',doc:'',n:'金額＋末五碼對到 2 張收款憑單（#R-1188、#R-1190），待人工挑'},
+     docs:'untouched'},
+   ],
+   docsBefore:[
+    {kind:'收款憑單 #R-1188',f:[['案名','蘆洲中正路 A 室'],['項目','服務費'],['金額','10,000'],['匯款後五碼','77120'],['入帳勾稽狀態','未勾稽'],['對帳證明','']]},
+    {kind:'收款憑單 #R-1190',f:[['案名','蘆洲中正路 B 室'],['項目','服務費'],['金額','10,000'],['匯款後五碼','77120'],['入帳勾稽狀態','未勾稽'],['對帳證明','']]}],
+ },
+ { key:'s4', tab:'④ 先錢後單',
+   title:'錢先到、單還沒開 → 先「待認領」，單開了再補上',
+   desc:'吳佩珊查一筆 12,000，錢已經到了，但業務還沒開定金單。錢不會消失，先躺在新表等。隔天定金單開好，機器人自己補上。',
+   shot:{date:'2026/10/12',amt:'12,000',note:'鄭雅文',acct:'808****30566'},
+   steps:[
+    {now:'吳佩珊在群組叫機器人查帳。', chat:[['吳佩珊','@查帳機器人 查帳 12000 30566']]},
+    {now:'機器人回群組。新表記一列標「待認領」：錢到了、截圖也有，只是還找不到單。',
+     chat:[['bot','✅【租售】2026/10/12 入帳 $12,000\n註記：鄭雅文']],
+     row:{t:'10/12 14:15',c:'（還沒對上）',m:'12,000',l5:'30566',d:'10/12',who:'吳佩珊',shot:true,r:'wait',doc:'',n:'錢到了但找不到單，等單開了再補'},
+     docs:'none'},
+    {now:'隔天，業務開好定金單（金額 12,000、末五碼 30566）。機器人回頭比對「待認領」的那列，對上了，自動補上。群組不會多發訊息。',
+     chat:[['sys','10/13（隔天）業務開好定金單']],
+     update:{c:'永和竹林路套房',r:'okLate',doc:'定金單 #D-0315',n:'10/13 定金單開好後自動補上'},
+     docs:'after'},
+   ],
+   docsAfter:[{kind:'定金單 #D-0315（10/13 新開）',stamp:'已入帳',f:[['案名','永和竹林路套房'],['租客','鄭雅文'],['定金金額','12,000'],['匯款後五碼','30566'],['入帳勾稽狀態','已入帳（自動）','chg'],['實際入帳日','2026/10/12','chg'],['對帳證明','SHOT','chg'],['對帳人','吳佩珊','chg']]}],
+ },
+ { key:'s5', tab:'⑤ 合併匯款',
+   title:'定金＋服務費一起匯 → 標「疑似」、不自己拆',
+   desc:'張家豪查一筆 23,000。剛好等於某案定金 15,000 加服務費 8,000（同一個末五碼）。機器人只提醒「可能是這兩張加起來」，不自己拆帳，等人確認。',
+   shot:{date:'2026/10/12',amt:'23,000',note:'周冠宇',acct:'812****61902'},
+   steps:[
+    {now:'張家豪在群組叫機器人查帳。', chat:[['張家豪','@查帳機器人 查帳 23000 61902']]},
+    {now:'機器人回群組。新表記一列標「疑似」，備註寫出可能是哪兩張加起來；兩張單都不動。',
+     chat:[['bot','✅【租售】2026/10/12 入帳 $23,000\n註記：周冠宇']],
+     row:{t:'10/12 15:40',c:'中和景平路兩房',m:'23,000',l5:'61902',d:'10/12',who:'張家豪',shot:true,r:'maybe',doc:'',n:'可能是定金單 #D-0318（15,000）＋收款憑單 #R-1195 服務費（8,000）合計，待人工確認'},
+     docs:'untouched'},
+   ],
+   docsBefore:[
+    {kind:'定金單 #D-0318',f:[['案名','中和景平路兩房'],['定金金額','15,000'],['匯款後五碼','61902'],['入帳勾稽狀態','未勾稽'],['對帳證明','']]},
+    {kind:'收款憑單 #R-1195',f:[['案名','中和景平路兩房'],['項目','服務費'],['金額','8,000'],['匯款後五碼','61902'],['入帳勾稽狀態','未勾稽'],['對帳證明','']]}],
+ },
+ { key:'s6', tab:'⑥ 銀行沒這筆',
+   title:'中信根本沒這筆 → 只記一列「查無入帳」',
+   desc:'李宗翰查一筆 9,000，但今天兩家都沒有這筆入帳。照樣記一列，以後問「那筆到底查過沒」有據可查；沒有截圖、也不動任何單。',
+   steps:[
+    {now:'李宗翰在群組叫機器人查帳。', chat:[['李宗翰','@查帳機器人 查帳 9000 44310']]},
+    {now:'機器人回群組（跟現在一樣列出今天有哪些入帳）。新表記一列「查無入帳」。',
+     chat:[['bot','❌ 兩家今日均無 $9,000 入帳\n→ 租售：15,000(陳志豪) / 32,000(林美華)\n→ 裝潢：今日無入帳']],
+     row:{t:'10/12 16:58',c:'（沒有入帳）',m:'9,000',l5:'44310',d:'',who:'李宗翰',shot:false,r:'none',doc:'',n:'中信今天沒有這筆'},
+     docs:'none'},
+   ],
+ },
+];
+
+let cur = 0, step = 0;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+function shotHTML(sh){
+  return `<div class="shot"><div class="bk">中國信託 企業網路銀行｜存款交易明細</div>
+  <table><thead><tr><th>交易日</th><th>摘要</th><th>存入</th><th>餘額</th><th>轉出帳號</th><th>註記</th></tr></thead>
+  <tbody><tr><td>${sh.date}</td><td>跨行轉入</td><td>${sh.amt}</td><td><span class="mosaic"></span></td><td>${sh.acct}</td><td>${esc(sh.note)}</td></tr></tbody></table>
+  <div class="cap">機器人查帳時同一次登入截下（示意圖）</div></div>`;
+}
+function openShot(){ $('modalBody').innerHTML = shotHTML(S[cur].shot); $('modal').classList.add('on'); }
+function closeShot(){ $('modal').classList.remove('on'); }
+$('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeShot(); });
+
+function rowHTML(r, fresh){
+  const [cls, label] = RES[r.r];
+  const shot = r.shot ? (fresh ? `<button class="shotbtn" onclick="openShot()">看截圖</button>` : `<span class="mini" title="舊紀錄的截圖"></span>`) : '<span class="empty">—</span>';
+  return `<tr class="${fresh?'fresh':'old'}"><td>${r.t}</td><td>${esc(r.c)}</td><td>${r.m}</td><td>${r.l5}</td><td>${r.d||'<span class="empty">—</span>'}</td>
+  <td>${r.who?esc(r.who):'<span class="empty">（空）</span>'}</td><td>${shot}</td><td><span class="tag ${cls}">${label}</span></td>
+  <td>${r.doc||'<span class="empty">—</span>'}</td><td class="note">${esc(r.n)}</td></tr>`;
+}
+function docHTML(d, mode){
+  const rows = d.f.map(([k,v,flag]) => {
+    let val = v === 'SHOT' ? `<span class="mini" onclick="openShot()" title="點開看截圖"></span>` : (v ? esc(v) : '<span class="empty">（空）</span>');
+    return `<dt>${k}</dt><dd class="${flag||''}">${val}</dd>`;
+  }).join('');
+  const mark = d.stamp ? `<div class="stamp">${d.stamp}</div>` : (mode === 'untouched' ? `<div class="untouched">沒被動到</div>` : '');
+  return `<div class="doc"><div class="h"><span>${d.kind}</span></div>${mark}<dl>${rows}</dl></div>`;
+}
+
+function render(){
+  const s = S[cur];
+  $('tabs').innerHTML = S.map((x,i) => `<button class="${i===cur?'on':''}" onclick="pick(${i})">${x.tab}</button>`).join('');
+  $('sTitle').textContent = s.title;
+  $('sDesc').textContent = s.desc;
+
+  // 聊天
+  let chat = [], row = null, docsMode = 'before';
+  for (let i = 0; i < step; i++){
+    const st = s.steps[i];
+    chat = chat.concat(st.chat || []);
+    if (st.row) row = {...st.row};
+    if (st.update) Object.assign(row, st.update);
+    if (st.docs) docsMode = st.docs;
+  }
+  $('chat').innerHTML = chat.map(([who, text]) => {
+    if (who === 'sys') return `<div class="sys">${esc(text)}</div>`;
+    if (who === 'bot') return `<div class="msg bot"><div class="av">查</div><div><div class="nm">查帳機器人</div><div class="bb">${esc(text)}</div></div></div>`;
+    return `<div class="msg"><div class="av" style="background:${COLORS[who]||'#888'}">${esc(who.slice(0,1))}</div><div><div class="nm">${esc(who)}</div><div class="bb">${esc(text)}</div></div></div>`;
+  }).join('') + (step === 0 ? '<div class="hint">按上面「下一步」開始</div>' : '');
+
+  // 新表
+  $('rows').innerHTML = (row ? rowHTML(row, true) : '') + OLD_ROWS.map(r => rowHTML(r, false)).join('');
+
+  // 單
+  let docs = '';
+  if (docsMode === 'after') docs = s.docsAfter.map(d => docHTML(d, 'after')).join('');
+  else if (docsMode === 'none') docs = `<div class="nodoc">${s.key === 's6' ? '中信沒有這筆，不會去動任何單。' : '目前沒有對得上的單（業務還沒開），所以沒有單被動到。'}</div>`;
+  else if (s.docsBefore) docs = s.docsBefore.map(d => docHTML(d, docsMode)).join('');
+  else docs = '<div class="nodoc">還沒查帳。</div>';
+  if (docsMode === 'after' && s.footNote) docs += `<div class="nodoc" style="flex-basis:100%;padding:4px 0 0;text-align:left">${s.footNote}</div>`;
+  $('docs').innerHTML = docs;
+
+  $('sNow').textContent = step === 0 ? '還沒開始。按「下一步」看同仁怎麼查、機器人做了什麼。' : `第 ${step} 步／共 ${s.steps.length} 步：${s.steps[step-1].now}`;
+  $('btnNext').disabled = step >= s.steps.length;
+  $('btnNext').textContent = step >= s.steps.length ? '這個例子看完了，點上面換下一個' : '下一步 ▶';
+}
+function pick(i){ cur = i; step = 0; render(); }
+$('btnNext').onclick = () => { if (step < S[cur].steps.length){ step++; render(); } };
+$('btnReset').onclick = () => { step = 0; render(); };
+render();
+</script>
+</body>
+</html>
